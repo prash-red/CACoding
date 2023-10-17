@@ -4,14 +4,16 @@ import entity.User;
 import entity.UserFactory;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
+import use_case.clear_users.ClearUserDataAccessInterface;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface {
+public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface, ClearUserDataAccessInterface {
 
     private final File csvFile;
 
@@ -96,4 +98,25 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
         return accounts.containsKey(identifier);
     }
 
+    @Override
+    public List<User> clearUsers() {
+        clear();
+        List<User> users = List.copyOf(accounts.values());
+        accounts.clear();
+        return users;
+
+    }
+    private void clear() {
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(csvFile));
+            writer.write(String.join(",", headers.keySet()));
+            writer.newLine();
+            writer.write("");
+            writer.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
