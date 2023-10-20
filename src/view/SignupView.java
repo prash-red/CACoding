@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.clear_users.ClearState;
 import interface_adapter.clear_users.ClearViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
@@ -25,17 +26,20 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
     private final SignupController signupController;
     private final ClearController clearController;
 
+    private final ClearViewModel clearViewModel;
+
     private final JButton signUp;
     private final JButton cancel;
 
     // TODO Note: this is the new JButton for clearing the users file
     private final JButton clear;
 
-    public SignupView(SignupController controller, SignupViewModel signupViewModel, ClearController clearController) {
+    public SignupView(SignupController controller, SignupViewModel signupViewModel, ClearController clearController, ClearViewModel clearViewModel) {
 
         this.signupController = controller;
         this.signupViewModel = signupViewModel;
         this.clearController = clearController;
+        this.clearViewModel = clearViewModel;
         signupViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
@@ -80,12 +84,20 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         // TODO Add the body to the actionPerformed method of the action listener below
         //      for the "clear" button. You'll need to write the controller before
         //      you can complete this.
+        SignupView thisView = this;
         clear.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(clear)) {
                             clearController.execute();
+                            ClearState currentState = clearViewModel.getState();
+                            StringBuilder sb = new StringBuilder();
+                            for (String user : currentState.getUsers()) {
+                                sb.append(user);
+                                sb.append("\n");
+                            }
+                            JOptionPane.showMessageDialog(thisView, sb);
                         }
                     }
                 }
